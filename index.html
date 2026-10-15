@@ -220,6 +220,12 @@ button:active:not(:disabled) { filter: brightness(.94); }
 .spinner { animation: spin 1s steps(8) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ---------- 성인 인증 실패 / 재시도 ---------- */
+#s-idscan .scan-out { display: none; }
+#s-idscan.retry .scan-out { display: block; }
+#s-idscan.retry .scan-in { display: none; }
+.f2-btn { position: absolute; border-radius: 12px; color: #fff; font-size: 32px; font-weight: 700; line-height: 1; }
+
 </style>
 </head>
 <body>
@@ -334,7 +340,7 @@ button:active:not(:disabled) { filter: brightness(.94); }
   <!-- ============ 11-1. 성인 인증 시작 (신분증 인식 중) ============ -->
   <section class="screen" id="s-idscan">
     <img class="a" src="data:image/png;base64,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" style="left:469px;top:197px;width:142px;height:142px" alt="">
-    <div class="t c m" style="top:445px;font-size:60px;color:#292a28" data-i="scan.title"></div>
+    <div class="t c m" style="top:445px;font-size:60px;color:#292a28" id="scan-title"></div>
     <div class="t c" style="top:554px;font-size:32px;color:#333633" data-i="scan.desc"></div>
     <svg class="a spinner" style="left:514px;top:766px;width:52px;height:52px" viewBox="0 0 52 52" aria-hidden="true">
       <g fill="#555">
@@ -350,6 +356,7 @@ button:active:not(:disabled) { filter: brightness(.94); }
       <line x1="373" y1="8" x2="361" y2="170" stroke="#2b2b2b" stroke-width="3"/>
       <rect x="87" y="10" width="211" height="53" fill="#b8b8b8" stroke="#2b2b2b" stroke-width="5"/>
       <polygon points="82,73 302,73 368,172 17,172" fill="#2b2b2b"/>
+      <g class="scan-in">
       <polygon points="188,96 306,96 334,162 182,162" fill="#fff"/>
       <g transform="rotate(5 241 132)">
         <rect x="186" y="107" width="112" height="52" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
@@ -358,9 +365,35 @@ button:active:not(:disabled) { filter: brightness(.94); }
         <rect x="230" y="130" width="48" height="3" fill="#666"/>
         <rect x="230" y="139" width="38" height="3" fill="#666"/>
       </g>
+      </g>
+      <g class="scan-out">
+        <polygon points="195,98 308,98 333,161 180,161" fill="#fff" stroke="#777" stroke-width="2"/>
+        <ellipse cx="246" cy="45" rx="20" ry="16" fill="#e0897e"/>
+      </g>
       <text x="114" y="132" fill="#fff" font-size="14" text-anchor="middle" data-i="scan.where1"></text>
       <text x="114" y="155" fill="#fff" font-size="14" text-anchor="middle" data-i="scan.where2"></text>
     </svg>
+    <svg class="a scan-out" style="left:578px;top:1408px;width:182px;height:163px" viewBox="0 0 182 163" aria-hidden="true">
+      <polygon points="4,4 114,4 178,154 23,160" fill="#fff" stroke="#5f5f5f" stroke-width="4" stroke-linejoin="round"/>
+      <text x="78" y="56" fill="#292a28" font-size="25" font-weight="700" text-anchor="middle" data-i="scan.card1"></text>
+      <text x="78" y="90" fill="#292a28" font-size="25" font-weight="700" text-anchor="middle" data-i="scan.card2"></text>
+    </svg>
+  </section>
+
+  <!-- ============ 11-2. 성인 인증 실패 (재시도 / 직원 승인 요청) ============ -->
+  <section class="screen" id="s-idfail2">
+    <svg class="a" style="left:474px;top:202px;width:132px;height:132px" viewBox="0 0 132 132" aria-hidden="true">
+      <circle cx="66" cy="66" r="66" fill="#d9363a"/>
+      <rect x="60" y="30" width="12" height="50" rx="5" fill="#fff"/>
+      <circle cx="66" cy="96" r="7.5" fill="#fff"/>
+    </svg>
+    <div class="t c b" style="top:431px;font-size:60px;color:#d9363a" data-i="fail2.title"></div>
+    <div class="t c" style="top:576px;font-size:32px;color:#292a28" data-i="fail2.retry"></div>
+    <div class="t c b" style="top:649px;font-size:32px;line-height:46px;color:#292a28;white-space:pre" data-i="fail2.staff"></div>
+    <button class="f2-btn" style="left:110px;top:1450px;width:420px;height:120px;background:#ababab" id="f2-cancel" data-i="btn.cancel"></button>
+    <button class="f2-btn" style="left:555px;top:1450px;width:420px;height:120px;background:#c19a68" id="f2-staff" data-i="btn.staff"></button>
+    <button class="f2-btn" style="left:110px;top:1596px;width:865px;height:119px;background:#272727" id="f2-retry" data-i="btn.retry"></button>
+    <div class="t" style="right:105px;top:1734px;font-size:21px;line-height:30px;color:#b5b5b5;text-align:right;white-space:pre" data-i="fail2.note"></div>
   </section>
 
   <!-- ============ 12. 성인 인증 필요 (실패) ============ -->
@@ -448,6 +481,21 @@ button:active:not(:disabled) { filter: brightness(.94); }
       <button class="dark pm-btn" style="left:65px;top:417px;width:343px;height:121px" data-pm="close" data-i="btn.back"></button>
       <button class="primary2 pm-btn" style="left:466px;top:417px;width:343px;height:121px" data-pm="start" data-i="btn.first"></button>
     </div>
+    <!-- 직원 원격 성인 인증 중 (3회 실패 후) -->
+    <div class="pm" id="pm-remote" style="left:70px;top:480px;width:940px;height:939px;border-radius:14px">
+      <div class="t c b" style="top:136px;font-size:52px;color:#292a28" data-i="pm.staff.title"></div>
+      <div class="t c" style="top:265px;font-size:32px;line-height:46px;color:#8f918e;white-space:pre" data-i="pm.staff.wait"></div>
+      <svg class="a spinner" style="left:432px;top:470px;width:72px;height:72px" viewBox="0 0 52 52" aria-hidden="true">
+        <g fill="#555">
+          <circle cx="26" cy="5" r="3.6" opacity=".15"/><circle cx="40.8" cy="11.2" r="3.6" opacity=".25"/>
+          <circle cx="47" cy="26" r="3.6" opacity=".35"/><circle cx="40.8" cy="40.8" r="3.6" opacity=".45"/>
+          <circle cx="26" cy="47" r="3.6" opacity=".6"/><circle cx="11.2" cy="40.8" r="3.6" opacity=".72"/>
+          <circle cx="5" cy="26" r="3.6" opacity=".86"/><circle cx="11.2" cy="11.2" r="3.6" opacity="1"/>
+        </g>
+      </svg>
+      <div class="t c b" style="top:600px;font-size:64px;color:#292a28" id="pm-remote-timer">03:00</div>
+      <button class="f2-btn" style="left:260px;top:756px;width:419px;height:119px;background:#272727" data-pm="close" data-i="btn.cancel"></button>
+    </div>
     <!-- 이미 확인된 신분증 -->
     <div class="pm" id="pm-dup" style="left:90px;top:681px;width:903px;height:549px">
       <div class="t c b" style="top:61px;font-size:46px;color:#151715" data-i="pm.dup.title"></div>
@@ -511,6 +559,7 @@ window.KIOSK_ASSETS = {
  * ========================================================= */
 const I18N = {
   ko: {
+    'scan.retryTitle': '성인 인증을 재시도합니다', 'scan.card1': '신분', 'scan.card2': '증', 'fail2.title': '성인 인증을 실패했습니다', 'fail2.retry': '재시도 버튼을 누르면 다시 신분증 인식이 시작됩니다.', 'fail2.staff': '직원 승인 요청 버튼을 누르면 직원이 원격으로\n성인 인증을 진행합니다.', 'fail2.note': '신분증 인식이 안 될 경우\n직원에게 문의해 주세요', 'btn.retry': '재시도',
     'scan.title': '성인 인증을 시작합니다', 'scan.desc': '신분증 인식 중입니다. 잠시만 기다려주세요.', 'scan.where1': '신분증', 'scan.where2': '스캔하는 곳', 'foot.remote': '직원 비대면 연결서비스', 'foot.tel3': '이용불편문의 010-4907-7779',
     'staff.connecting': '직원 연결중입니다...',
     'err.done': '체크인 완료', 'err.doneW1': '이미 모든 객실의 체크인이 완료된 예약입니다.',
@@ -572,6 +621,7 @@ const I18N = {
     'date': '{M}월 {D}일 {h}시 {m}분',
   },
   en: {
+    'scan.retryTitle': 'Retrying adult verification', 'scan.card1': 'ID', 'scan.card2': 'card', 'fail2.title': 'Adult verification failed', 'fail2.retry': 'Press Retry to scan your ID again.', 'fail2.staff': 'Press Request Staff and a staff member\nwill verify your age remotely.', 'fail2.note': 'If your ID cannot be read,\nplease contact staff', 'btn.retry': 'Retry',
     'scan.title': 'Starting adult verification', 'scan.desc': 'Reading your ID. Please wait a moment.', 'scan.where1': 'ID', 'scan.where2': 'scan area', 'foot.remote': 'Remote staff service', 'foot.tel3': 'Help desk 010-4907-7779',
     'staff.connecting': 'Connecting to staff...',
     'err.done': 'Already checked in', 'err.doneW1': 'All rooms in this booking are already checked in.',
@@ -633,6 +683,7 @@ const I18N = {
     'date': '{M}/{D} {h}:{m}',
   },
   ja: {
+    'scan.retryTitle': '成人認証を再試行します', 'scan.card1': '身分', 'scan.card2': '証', 'fail2.title': '成人認証に失敗しました', 'fail2.retry': '再試行を押すと身分証の読み取りを再開します。', 'fail2.staff': 'スタッフ承認を依頼を押すと、スタッフが\n遠隔で成人認証を行います。', 'fail2.note': '身分証が読み取れない場合は\nスタッフにお問い合わせください', 'btn.retry': '再試行',
     'scan.title': '成人認証を開始します', 'scan.desc': '身分証を読み取り中です。少々お待ちください。', 'scan.where1': '身分証', 'scan.where2': 'スキャン位置', 'foot.remote': 'スタッフ遠隔接続サービス', 'foot.tel3': 'お困りの際は 010-4907-7779',
     'staff.connecting': 'スタッフに接続中です...',
     'err.done': 'チェックイン済み', 'err.doneW1': 'この予約のすべての客室はチェックイン済みです。',
@@ -694,6 +745,7 @@ const I18N = {
     'date': '{M}月{D}日 {h}時{m}分',
   },
   zh: {
+    'scan.retryTitle': '重新进行成人验证', 'scan.card1': '身份', 'scan.card2': '证', 'fail2.title': '成人验证失败', 'fail2.retry': '点击重试将重新识别身份证件。', 'fail2.staff': '点击请求员工批准后，\n员工将远程进行成人验证。', 'fail2.note': '如无法识别证件，\n请联系工作人员', 'btn.retry': '重试',
     'scan.title': '开始成人验证', 'scan.desc': '正在识别身份证件，请稍候。', 'scan.where1': '证件', 'scan.where2': '扫描区域', 'foot.remote': '员工远程连线服务', 'foot.tel3': '服务热线 010-4907-7779',
     'staff.connecting': '正在连接工作人员...',
     'err.done': '已入住', 'err.doneW1': '该预订的所有房间均已办理入住。',
@@ -861,6 +913,7 @@ const CHROME = {
   done:     { clock: 'key', footer: 'b' },
   staffcall: { clock: 'std', nav: 'home' },
   idscan:   { clock: 'std', footer: 'c2' },
+  idfail2:  { clock: 'std', footer: 'c2' },
 };
 const chrome = $('#chrome');
 
@@ -904,7 +957,7 @@ function applyLang() {
   $$('.pane').forEach(p => { const d = $('.desc', p); if (d) d.textContent = t(d.dataset.k); });
   $$('.keypad .small').forEach(b => { b.textContent = t('key.clear'); });
   $$('.keypad .del span').forEach(s => { s.textContent = t('key.del'); });
-  if (ENTER[S.screen] && ['list', 'guests', 'idperson', 'idok', 'issuing', 'done'].includes(S.screen)) REFRESH[S.screen]?.();
+  if (ENTER[S.screen] && ['list', 'guests', 'idperson', 'idscan', 'idok', 'issuing', 'done'].includes(S.screen)) REFRESH[S.screen]?.();
 }
 function setLang(l) { S.lang = l; applyLang(); }
 
@@ -1340,11 +1393,34 @@ function renderGuests() {
 }
 $('#g-minus').addEventListener('click', () => { S.guests--; renderGuests(); });
 $('#g-plus').addEventListener('click', () => { S.guests++; renderGuests(); });
-$('#g-next').addEventListener('click', () => { S.guestIdx = 1; go('idprep'); });
+$('#g-next').addEventListener('click', () => { S.guestIdx = 1; S.failCount = 0; S.staffOk = false; go('idprep'); });
 
 function renderIdPerson() { $('#idp-progress').textContent = t('id.progress', { n: S.guests, i: S.guestIdx }); }
 // 다음 → 성인 인증 시작(신분증 인식 중) → 잠시 후 인증 성공
-$('#idp-next').addEventListener('click', () => go('idscan', { push: false }));
+$('#idp-next').addEventListener('click', () => { S.scanRetry = false; go('idscan', { push: false }); });
+
+/* UT 시나리오: 김코드(0000) 102호 첫 번째 투숙객은 신분증 인식이 계속 실패
+   - 실패 3회 전까지 '직원 승인 요청'은 반응 없음
+   - 3회 실패 후 '직원 승인 요청' → 직원 원격 성인 인증 중 팝업 → 3초 후 성인 인증 성공 */
+S.failCount = 0;
+S.staffOk = false;
+const utFail = () => S.flow === 'checkin' && S.res && S.res.no === '0000' && S.res.rooms[0].room === '102'
+  && S.guestIdx === 1 && !S.staffOk;
+function renderScan() {
+  $('#s-idscan').classList.toggle('retry', !!S.scanRetry);
+  $('#scan-title').textContent = t(S.scanRetry ? 'scan.retryTitle' : 'scan.title');
+}
+$('#f2-cancel').addEventListener('click', () => openPm('stop'));
+$('#f2-retry').addEventListener('click', () => { S.scanRetry = true; go('idscan', { push: false }); });
+$('#f2-staff').addEventListener('click', () => {
+  if (S.failCount < 3) return;
+  openPm('remote');
+  let left = 180;
+  const show = () => { $('#pm-remote-timer').textContent = `${pad(Math.floor(left / 60))}:${pad(left % 60)}`; };
+  show();
+  S.pmTimers.push(setInterval(() => { left = Math.max(0, left - 1); show(); }, 1000));
+  pmLater(() => { closePm(); S.staffOk = true; go('idok', { push: false }); }, 3000);
+});
 // 신분증 그림 터치 = 인식 실패 시나리오 (1번째 투숙객: 성인 인증 필요 / 2번째부터: 이미 확인된 신분증)
 $('#idp-image').addEventListener('click', () => {
   go('idfail', { push: false });
@@ -1446,6 +1522,7 @@ const REFRESH = {
   guests: renderGuests,
   idperson: renderIdPerson,
   idok: renderIdOk,
+  idscan: () => renderScan(),
   issuing: () => roomCard($('#issue-card'), S.res, false),
   done: renderDone,
 };
@@ -1460,7 +1537,13 @@ const ENTER = {
   idprep: () => {},
   idperson: renderIdPerson,
   idok: renderIdOk,
-  idscan: () => { later(() => go('idok', { push: false }), 2500); },
+  idscan: () => {
+    renderScan();
+    later(() => {
+      if (utFail()) { S.failCount++; go('idfail2', { push: false }); }
+      else go('idok', { push: false });
+    }, 2500);
+  },
   issuing: () => {
     REFRESH.issuing();
     later(() => go('done', { push: false }), 3600);
