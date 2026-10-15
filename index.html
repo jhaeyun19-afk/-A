@@ -440,7 +440,7 @@ button:active:not(:disabled) { filter: brightness(.94); }
     <button class="gold" style="left:550px;top:680px;width:390px;height:118px" data-go="home" data-i="btn.first"></button>
     <div class="roomcard" style="top:858px" id="done-card"></div>
     <div class="t c" style="top:1578px;font-size:100px;color:#b6b7b5;left:-5px" id="done-count">25</div>
-    <div class="t c" style="top:1704px;font-size:28px;color:#b6b7b5" data-i="done.back"></div>
+    <div class="t c" id="done-back" style="top:1704px;font-size:28px;color:#b6b7b5" data-i="done.back"></div>
   </section>
 
   <!-- ============ 직원 연결 중 (하단 이용불편문의 터치 시) ============ -->
@@ -1552,6 +1552,10 @@ const ENTER = {
     S.history = [];
     if (S.flow === 'checkin' && S.res) checkedIn.add(roomKey(S.res));
     renderDone();
+    // UT 시나리오: 최하늘(5555) 202호 체크인 완료 시에는 카운트다운 없이 화면 유지
+    const hold = S.flow === 'checkin' && S.res && S.res.no === '5555' && S.res.rooms[0].room === '202';
+    $('#done-count').hidden = $('#done-back').hidden = hold;
+    if (hold) return;
     let n = 25;
     $('#done-count').textContent = n;
     const id = setInterval(() => {
