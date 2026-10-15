@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Self Check-in Kiosk</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="kiosk.css?v=3">
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+
+  <!-- ============ 1. 언어 선택 ============ -->
+  <section class="screen" id="s-lang">
+    <div class="t c" style="top:203px;font-size:48px">어서오세요!</div>
+    <div class="t c" style="top:270px;font-size:32px">Welcome!</div>
+    <img class="a" src="assets/translate.png" style="left:480px;top:366px;width:116px;height:99px" alt="">
+    <div class="t c" style="top:528px;font-size:60px">국가 언어를 선택해주세요</div>
+    <div class="t c" style="top:608px;font-size:36px">Please select your country language</div>
+    <button class="lang-opt" data-lang="ko" style="top:754px"><span>한국어</span><i></i></button>
+    <button class="lang-opt" data-lang="en" style="top:946px"><span>English</span><i></i></button>
+    <button class="lang-opt" data-lang="zh" style="top:1138px"><span>中國語</span><i></i></button>
+    <button class="lang-opt" data-lang="ja" style="top:1330px"><span>日本語</span><i></i></button>
+    <img class="a" src="assets/hand.png" style="left:474px;top:1571px;width:118px;height:159px" alt="">
+  </section>
+
+  <!-- ============ 2. 메인 ============ -->
+  <section class="screen" id="s-main" data-footer="main">
+    <div class="clock" style="left:0;width:1050px;top:39px"></div>
+    <div class="chips">
+      <button data-lang="ko">한국어</button><button data-lang="en">ENG</button><button data-lang="ja">日本語</button><button data-lang="zh">中文</button>
+    </div>
+    <div class="t c b" style="top:178px;font-size:78px" data-i="main.title"></div>
+    <div class="t c" style="top:298px;font-size:38px;line-height:65px;white-space:pre" data-i="main.sub"></div>
+    <button class="tile" id="tile-daesil" style="left:31px;top:488px;width:494px;height:449px" data-go="walkin:daesil" data-i="main.daesil"></button>
+    <button class="tile" id="tile-sukbak" style="left:548px;top:488px;width:493px;height:449px" data-go="walkin:sukbak" data-i="main.sukbak"></button>
+    <button class="tile" id="tile-checkin" style="left:31px;top:964px;width:494px;height:215px" data-go="checkin" data-i="main.checkin"></button>
+    <button class="tile" id="tile-checkout" style="left:548px;top:964px;width:493px;height:215px" data-go="checkout" data-i="main.checkout"></button>
+    <button class="roomcheck" data-go="roomcheck">
+      <img src="assets/card-icon.png" alt=""><span data-i="main.roomcheck"></span>
+    </button>
+    <img class="a" src="assets/banner.png" style="left:31px;top:1386px;width:1010px;height:469px" alt="">
+  </section>
+
+  <!-- ============ 3. 예약 조회 (탭) ============ -->
+  <section class="screen" id="s-lookup" data-nav="std" data-footer="a">
+    <div class="t c b" style="top:196px;font-size:52px" data-i="lookup.title"></div>
+    <div class="tabs" id="lookup-tabs">
+      <div class="tab-pill"></div>
+      <button data-tab="name" data-i="tab.name"></button>
+      <button data-tab="number" data-i="tab.number"></button>
+      <button data-tab="qr" data-i="tab.qr"></button>
+    </div>
+    <div class="pane pane-name" data-pane="name" style="top:522px"></div>
+    <div class="pane pane-number" data-pane="number" style="top:526px"></div>
+    <div class="pane pane-qr" data-pane="qr" style="top:522px"></div>
+    <button class="primary submit" disabled data-i="btn.lookup"></button>
+  </section>
+
+  <!-- ============ 4. 예약자명 (단독) ============ -->
+  <section class="screen" id="s-name" data-nav="std" data-footer="a">
+    <div class="t c b" style="top:203px;font-size:50px" data-i="tab.name"></div>
+    <div class="pane pane-name solo" style="top:314px"></div>
+    <button class="primary submit" disabled data-i="btn.lookup"></button>
+  </section>
+
+  <!-- ============ 5. 예약번호 (단독) ============ -->
+  <section class="screen" id="s-number" data-nav="std" data-footer="a">
+    <div class="t c b" style="top:191px;font-size:50px" data-i="tab.number"></div>
+    <div class="pane pane-number" style="top:299px"></div>
+    <button class="primary submit" disabled data-i="btn.lookup"></button>
+  </section>
+
+  <!-- ============ 6. 복수의 예약 확인 ============ -->
+  <section class="screen" id="s-list" data-nav="list" data-footer="b">
+    <div class="list-scroll" id="list-scroll">
+      <div class="list-inner" id="list-inner">
+        <div class="t b" style="left:144px;top:16px;font-size:47px" id="list-title" data-i="list.title"></div>
+        <div class="t" style="left:145px;top:103px;font-size:30px;line-height:39px;color:#8f918e;white-space:pre" id="list-sub" data-i="list.sub"></div>
+        <div id="cards"></div>
+      </div>
+    </div>
+    <div class="scrollbar" id="list-bar"><i></i></div>
+    <div class="footband"></div>
+  </section>
+
+  <!-- ============ 9. 투숙 인원 ============ -->
+  <section class="screen" id="s-guests" data-nav="sm" data-footer="c1">
+    <div class="t c b" style="top:168px;font-size:62px;color:#151715" data-i="guests.title"></div>
+    <div class="t c" style="top:301px;font-size:39px;color:#898d89" id="guests-max"></div>
+    <div class="t c" style="top:531px;font-size:65px;color:#151715;left:-14px" data-i="guests.adult"></div>
+    <button class="round" id="g-minus" style="left:199px"><i class="h"></i></button>
+    <div class="t b" id="g-count" style="left:433px;width:200px;text-align:center;top:651px;font-size:100px;color:#151715">2</div>
+    <button class="round" id="g-plus" style="left:732px"><i class="h"></i><i class="v"></i></button>
+    <div class="t c m" style="top:927px;font-size:38px;line-height:55px;color:#151715;white-space:pre" data-i="guests.notice"></div>
+    <button class="primary2" style="left:324px;top:1328px;width:424px;height:120px" id="g-next" data-i="btn.agree"></button>
+  </section>
+
+  <!-- ============ 10. 신분증 준비 (19) ============ -->
+  <section class="screen" id="s-idprep" data-footer="c2">
+    <img class="a" src="assets/icon-19.png" style="left:456px;top:197px;width:164px;height:164px" alt="">
+    <div class="t c" style="top:458px;font-size:62px;color:#151715" data-i="id.title"></div>
+    <div class="t c" style="top:560px;font-size:34px;line-height:49px;color:#151715;white-space:pre" data-i="id.prep"></div>
+    <img class="a" src="assets/id-guide.png" style="left:330px;top:728px;width:360px;height:380px" alt="">
+    <button class="primary2" style="left:337px;top:1385px;width:402px;height:121px" data-go="idperson" data-i="btn.next"></button>
+  </section>
+
+  <!-- ============ 11. 신분증 준비 (인원별) ============ -->
+  <section class="screen" id="s-idperson" data-footer="c2">
+    <img class="a" src="assets/people.png" style="left:475px;top:235px;width:130px;height:92px" alt="">
+    <div class="t c" style="top:462px;font-size:62px;color:#151715" data-i="id.title"></div>
+    <div class="t c" style="top:582px;font-size:39px;color:#151715" id="idp-progress"></div>
+    <div class="t c" style="top:700px;font-size:34px;line-height:46px;color:#151715;white-space:pre" data-i="id.all"></div>
+    <img class="a" id="idp-image" src="assets/id-guide.png" style="left:330px;top:924px;width:360px;height:380px" alt="">
+    <button class="primary2" style="left:341px;top:1573px;width:402px;height:120px" id="idp-next" data-i="btn.next"></button>
+  </section>
+
+  <!-- ============ 12. 성인 인증 필요 (실패) ============ -->
+  <section class="screen" id="s-idfail" data-footer="d">
+    <div class="clock" style="left:0;width:1078px;top:64px"></div>
+    <img class="a" src="assets/icon-19b.png" style="left:454px;top:210px;width:168px;height:171px" alt="">
+    <div class="t c" style="top:414px;font-size:62px;color:#070908" data-i="fail.title"></div>
+    <div class="t c" style="top:526px;font-size:34px;line-height:50px;color:#333633;white-space:pre" data-i="fail.desc"></div>
+    <img class="a" src="assets/id-insert.png" style="left:110px;top:700px;width:382px;height:360px" alt="">
+    <div class="a" style="left:546px;top:730px;width:3px;height:294px;background:#d9dbd8"></div>
+    <img class="a" src="assets/id-photo.png" style="left:585px;top:735px;width:377px;height:341px" alt="">
+    <button class="dark" style="left:124px;top:1199px;width:403px;height:118px" id="fail-cancel" data-i="btn.cancel"></button>
+    <button class="primary2 gold2" style="left:549px;top:1199px;width:403px;height:118px;font-size:36px" id="fail-staff" data-i="btn.staff"></button>
+  </section>
+
+  <!-- ============ 13. 성인 인증 성공 ============ -->
+  <section class="screen" id="s-idok" data-footer="c3">
+    <div class="clock" style="left:0;width:1078px;top:66px"></div>
+    <img class="a" src="assets/check-gold.png" style="left:463px;top:218px;width:159px;height:159px" alt="">
+    <div class="t c m" style="top:465px;font-size:62px;line-height:81px;color:#151715;white-space:pre" data-i="ok.title"></div>
+    <div class="t c" style="top:697px;font-size:39px;color:#151715" id="ok-progress"></div>
+    <div class="t" style="left:130px;top:1156px;font-size:33px;color:#151715" data-i="ok.ing"></div>
+    <div class="t" style="right:134px;top:1156px;font-size:33px;color:#898d89" id="ok-pct"></div>
+    <div class="bar" style="left:131px;top:1203px;width:818px;height:11px"><i id="ok-bar"></i></div>
+    <button class="primary2" style="left:306px;top:1550px;width:472px;height:121px" id="ok-next" data-i="btn.next"></button>
+  </section>
+
+  <!-- ============ 14. 객실 키 발급 중 ============ -->
+  <section class="screen" id="s-issuing" data-footer="b">
+    <div class="t c" style="top:268px;font-size:36px;color:#8f918e" data-i="issue.confirmed"></div>
+    <div class="t c m" style="top:328px;font-size:48px;color:#292a28" data-i="issue.title"></div>
+    <div class="issue-bar"><i></i></div>
+    <div class="t c" style="top:513px;font-size:30px;color:#777c73" data-i="issue.wait"></div>
+    <div class="roomcard" style="top:607px" id="issue-card"></div>
+  </section>
+
+  <!-- ============ 15. 객실 키 발급 완료 ============ -->
+  <section class="screen" id="s-done" data-footer="b">
+    <img class="a" src="assets/check-done.png" style="left:480px;top:189px;width:119px;height:120px" alt="">
+    <div class="t c b" style="top:366px;font-size:118px;color:#bc9868;left:-6px" id="done-room">301</div>
+    <div class="t c b" style="top:512px;font-size:47px;color:#292a28" id="done-title"></div>
+    <div class="t c" style="top:588px;font-size:33px;color:#8f918e" data-i="done.thanks"></div>
+    <button class="gold" style="left:140px;top:680px;width:390px;height:118px" id="done-again"></button>
+    <button class="gold" style="left:550px;top:680px;width:390px;height:118px" data-go="home" data-i="btn.first"></button>
+    <div class="roomcard" style="top:858px" id="done-card"></div>
+    <div class="t c" style="top:1578px;font-size:100px;color:#b6b7b5;left:-5px" id="done-count">25</div>
+    <div class="t c" style="top:1704px;font-size:28px;color:#b6b7b5" data-i="done.back"></div>
+  </section>
+
+  <!-- 공통 상단/하단 -->
+  <div id="chrome">
+    <div class="clock" id="std-clock"></div>
+    <button class="nav-back" id="nav-back" aria-label="back"></button>
+    <button class="nav-home" id="nav-home" aria-label="home"></button>
+    <div class="footer" id="footer">
+      <i>19</i><span data-i="foot.age"></span><span id="foot-tel"></span>
+    </div>
+  </div>
+
+  <!-- 성인 인증 팝업 (신분증 인식 실패 화면 위) -->
+  <div class="overlay" id="pm-overlay">
+    <!-- 직원 원격 성인 인증 중 -->
+    <div class="pm" id="pm-staff" style="left:93px;top:480px;width:905px;height:950px">
+      <div class="t c m" style="top:129px;font-size:46px;color:#151715" data-i="pm.staff.title"></div>
+      <div class="t c" style="top:280px;font-size:30px;line-height:49px;color:#151715;white-space:pre" data-i="pm.staff.wait"></div>
+      <button class="dark pm-btn" style="left:248px;top:762px;width:408px;height:118px" data-pm="close" data-i="btn.cancel"></button>
+    </div>
+    <!-- 직원 원격 성인 인증 완료 -->
+    <div class="pm" id="pm-staffdone" style="left:93px;top:480px;width:905px;height:950px">
+      <div class="t c m" style="top:129px;font-size:46px;color:#151715" data-i="pm.staff.title"></div>
+      <div class="t c" style="top:286px;font-size:30px;line-height:49px;color:#151715;white-space:pre" data-i="pm.staff.done"></div>
+      <div class="t c b" style="top:474px;font-size:60px;color:#151715" id="pm-timer">03 : 00</div>
+      <div class="t c" style="top:619px;font-size:28px;color:#151715" data-i="pm.staff.note"></div>
+      <button class="dark pm-btn" style="left:248px;top:762px;width:408px;height:118px" data-pm="close" data-i="btn.cancel"></button>
+    </div>
+    <!-- 성인 인증 중단 -->
+    <div class="pm" id="pm-stop" style="left:107px;top:656px;width:879px;height:598px">
+      <div class="t c m" style="top:73px;font-size:46px;color:#151715" data-i="pm.stop.title"></div>
+      <div class="t c" style="top:260px;font-size:28px;color:#8f918e" data-i="pm.stop.desc"></div>
+      <button class="dark pm-btn" style="left:65px;top:417px;width:343px;height:121px" data-pm="close" data-i="btn.back"></button>
+      <button class="primary2 pm-btn" style="left:466px;top:417px;width:343px;height:121px" data-pm="start" data-i="btn.first"></button>
+    </div>
+    <!-- 이미 확인된 신분증 -->
+    <div class="pm" id="pm-dup" style="left:90px;top:681px;width:903px;height:549px">
+      <div class="t c b" style="top:61px;font-size:46px;color:#151715" data-i="pm.dup.title"></div>
+      <div class="t c" style="top:242px;font-size:28px;line-height:42px;color:#8f918e;white-space:pre" data-i="pm.dup.desc"></div>
+      <button class="dark pm-btn" style="left:35px;top:388px;width:399px;height:118px" data-pm="stop" data-i="btn.stopAuth"></button>
+      <button class="primary2 pm-btn" style="left:463px;top:388px;width:404px;height:118px" data-pm="retry" data-i="btn.retryId"></button>
+    </div>
+  </div>
+
+  <!-- 모달 -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="t c b" style="top:149px;font-size:56px;left:-4px" id="m-title"></div>
+      <div class="m-box" id="m-box"></div>
+      <div class="m-warn" id="m-warn">
+        <img src="assets/alert.png" alt="">
+        <div class="t b" style="left:109px;top:636px;font-size:30px;color:#292a28" id="m-w1"></div>
+        <div class="t" style="left:109px;top:686px;font-size:27px;color:#292a28" id="m-w2"></div>
+        <div class="t m" style="left:109px;top:744px;font-size:18px;color:#292a28" id="m-w3"></div>
+      </div>
+      <button class="dark" style="left:65px;top:875px;width:426px;height:118px;font-weight:700;font-size:38px" id="m-cancel" data-i="btn.cancel"></button>
+      <button class="gold" style="left:509px;top:875px;width:426px;height:118px;font-size:38px" id="m-ok" data-i="btn.ok"></button>
+    </div>
+  </div>
+
+</div>
+</div>
+<script src="kiosk.js?v=4"></script>
+</body>
+</html>
