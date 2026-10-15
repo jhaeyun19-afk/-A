@@ -464,6 +464,7 @@ window.KIOSK_ASSETS = {
  * ========================================================= */
 const I18N = {
   ko: {
+    'err.done': '체크인 완료', 'err.doneW1': '이미 모든 객실의 체크인이 완료된 예약입니다.',
     'card.adults': '투숙 인원', 'res.adults': '성인 {n}명', 
     'card.summary': '객실 · 인원', 'res.summary': '{r}실 · 총 {n}명', 'room.line': '{type} · 성인 {n}명', 'room.title': '객실 {r}개 · 총 {n}명',
     'pm.staff.title': '직원 원격 성인 인증 중',
@@ -522,6 +523,7 @@ const I18N = {
     'date': '{M}월 {D}일 {h}시 {m}분',
   },
   en: {
+    'err.done': 'Already checked in', 'err.doneW1': 'All rooms in this booking are already checked in.',
     'card.adults': 'Guests', 'res.adults': '{n} adults', 
     'card.summary': 'Rooms · Guests', 'res.summary': '{r} rooms · {n} guests', 'room.line': '{type} · {n} adults', 'room.title': '{r} rooms · {n} guests',
     'pm.staff.title': 'Remote Staff Verification',
@@ -580,6 +582,7 @@ const I18N = {
     'date': '{M}/{D} {h}:{m}',
   },
   ja: {
+    'err.done': 'チェックイン済み', 'err.doneW1': 'この予約のすべての客室はチェックイン済みです。',
     'card.adults': '宿泊人数', 'res.adults': '大人{n}名', 
     'card.summary': '客室 · 人数', 'res.summary': '{r}室 · 計{n}名', 'room.line': '{type} · 大人{n}名', 'room.title': '客室{r}室 · 計{n}名',
     'pm.staff.title': 'スタッフによる遠隔成人認証中',
@@ -638,6 +641,7 @@ const I18N = {
     'date': '{M}月{D}日 {h}時{m}分',
   },
   zh: {
+    'err.done': '已入住', 'err.doneW1': '该预订的所有房间均已办理入住。',
     'card.adults': '入住人数', 'res.adults': '成人{n}人', 
     'card.summary': '房间 · 人数', 'res.summary': '{r}间 · 共{n}人', 'room.line': '{type} · 成人{n}人', 'room.title': '{r}间客房 · 共{n}人',
     'pm.staff.title': '员工远程成人验证中',
@@ -717,6 +721,10 @@ const RESERVATIONS = [
 ].map(r => ({ ...r, total: r.rooms.reduce((n, x) => n + x.adults, 0) }));
 // 예약 1건의 객실들을 객실별 항목으로 나눔 → 목록에서 객실을 하나씩 선택
 const splitRooms = list => list.flatMap(r => r.rooms.map(x => ({ ...r, rooms: [x], total: x.adults })));
+// 체크인을 마친 객실 (예약번호-객실번호). 페이지를 새로고침하기 전까지 유지
+const checkedIn = new Set();
+const roomKey = r => `${r.no}-${r.rooms[0].room}`;
+const notCheckedIn = list => list.filter(r => !checkedIn.has(roomKey(r)));
 const roomNos = r => r.rooms.map(x => t('room.no', { n: x.room })).join(', ');
 const roomType = name => (ROOM_TYPES[S.lang] && ROOM_TYPES[S.lang][name]) || name;
 const ROOM_TYPES = {
@@ -1134,6 +1142,10 @@ function searchNumber(q) {
 function found(list, method, q) {
   if (!list.length) return openError(method, q);
   S.matches = splitRooms(list);
+  if (S.flow === 'checkin') {
+    S.matches = notCheckedIn(S.matches);
+    if (!S.matches.length) return openError(method, q, true);
+  }
   S.selected = -1;
   go('list');   // 항상 복수의 예약 확인 화면을 거쳐 예약 세부 정보 확인으로 이동
 }
@@ -1246,11 +1258,11 @@ function openConfirm() {
     onOk: () => go('guests'),
   });
 }
-function openError(method, q) {
+function openError(method, q, allDone = false) {
   openModal({
     title: t('err.title'),
-    rows: [[t('err.method'), t(method === 'name' ? 'tab.name' : 'tab.number')], [t('err.input'), q || '-'], [t('err.result'), t('err.none')]],
-    w1: t('err.w1'), w2: t('err.w2'), w3: t('err.w3'),
+    rows: [[t('err.method'), t(method === 'name' ? 'tab.name' : method === 'qr' ? 'tab.qr' : 'tab.number')], [t('err.input'), q || '-'], [t('err.result'), t(allDone ? 'err.done' : 'err.none')]],
+    w1: t(allDone ? 'err.doneW1' : 'err.w1'), w2: t('err.w2'), w3: t('err.w3'),
     onOk: null,
   });
 }
@@ -1353,12 +1365,12 @@ $('#done-again').addEventListener('click', () => {
   if (S.flow !== 'checkin') resetLookup();
   if (S.flow === 'checkout') go('number', { push: false });
   else if (S.flow === 'walkin') goHome();
-  else if (S.matches.length) {
-    // 추가 체크인: 같은 조회 결과의 복수의 예약 확인 화면으로 돌아가 다른 객실 선택
+  else if ((S.matches = notCheckedIn(S.matches)).length) {
+    // 추가 체크인: 같은 조회 결과에서 이미 체크인한 객실을 뺀 복수의 예약 확인 화면으로 이동
     S.history = ['main', 'lookup'];
     S.selected = -1;
     go('list', { push: false });
-  } else go('lookup', { push: false });
+  } else { resetLookup(); go('lookup', { push: false }); }
 });
 
 /* =========================================================
@@ -1393,6 +1405,7 @@ const ENTER = {
   },
   done: () => {
     S.history = [];
+    if (S.flow === 'checkin' && S.res) checkedIn.add(roomKey(S.res));
     renderDone();
     let n = 25;
     $('#done-count').textContent = n;
