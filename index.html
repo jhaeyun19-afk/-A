@@ -1350,10 +1350,15 @@ function renderDone() {
 }
 $('#done-again').addEventListener('click', () => {
   S.history = ['main'];
-  resetLookup();
+  if (S.flow !== 'checkin') resetLookup();
   if (S.flow === 'checkout') go('number', { push: false });
   else if (S.flow === 'walkin') goHome();
-  else go('lookup', { push: false });
+  else if (S.matches.length) {
+    // 추가 체크인: 같은 조회 결과의 복수의 예약 확인 화면으로 돌아가 다른 객실 선택
+    S.history = ['main', 'lookup'];
+    S.selected = -1;
+    go('list', { push: false });
+  } else go('lookup', { push: false });
 });
 
 /* =========================================================
