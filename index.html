@@ -464,6 +464,7 @@ window.KIOSK_ASSETS = {
  * ========================================================= */
 const I18N = {
   ko: {
+    'card.adults': '투숙 인원', 'res.adults': '성인 {n}명', 
     'card.summary': '객실 · 인원', 'res.summary': '{r}실 · 총 {n}명', 'room.line': '{type} · 성인 {n}명', 'room.title': '객실 {r}개 · 총 {n}명',
     'pm.staff.title': '직원 원격 성인 인증 중',
     'pm.staff.wait': '직원이 원격으로 성인 인증을 처리하고 있습니다.\n잠시만 기다려주세요.',
@@ -521,6 +522,7 @@ const I18N = {
     'date': '{M}월 {D}일 {h}시 {m}분',
   },
   en: {
+    'card.adults': 'Guests', 'res.adults': '{n} adults', 
     'card.summary': 'Rooms · Guests', 'res.summary': '{r} rooms · {n} guests', 'room.line': '{type} · {n} adults', 'room.title': '{r} rooms · {n} guests',
     'pm.staff.title': 'Remote Staff Verification',
     'pm.staff.wait': 'A staff member is verifying your age remotely.\nPlease wait a moment.',
@@ -578,6 +580,7 @@ const I18N = {
     'date': '{M}/{D} {h}:{m}',
   },
   ja: {
+    'card.adults': '宿泊人数', 'res.adults': '大人{n}名', 
     'card.summary': '客室 · 人数', 'res.summary': '{r}室 · 計{n}名', 'room.line': '{type} · 大人{n}名', 'room.title': '客室{r}室 · 計{n}名',
     'pm.staff.title': 'スタッフによる遠隔成人認証中',
     'pm.staff.wait': 'スタッフが遠隔で成人認証を処理しています。\n少々お待ちください。',
@@ -635,6 +638,7 @@ const I18N = {
     'date': '{M}月{D}日 {h}時{m}分',
   },
   zh: {
+    'card.adults': '入住人数', 'res.adults': '成人{n}人', 
     'card.summary': '房间 · 人数', 'res.summary': '{r}间 · 共{n}人', 'room.line': '{type} · 成人{n}人', 'room.title': '{r}间客房 · 共{n}人',
     'pm.staff.title': '员工远程成人验证中',
     'pm.staff.wait': '员工正在远程处理成人验证。\n请稍候。',
@@ -711,6 +715,8 @@ const RESERVATIONS = [
     rooms: [{ room: '201', type: '프리미어 스위트', adults: 2 }, { room: '202', type: '패밀리 트윈', adults: 3 }],
   },
 ].map(r => ({ ...r, total: r.rooms.reduce((n, x) => n + x.adults, 0) }));
+// 예약 1건의 객실들을 객실별 항목으로 나눔 → 목록에서 객실을 하나씩 선택
+const splitRooms = list => list.flatMap(r => r.rooms.map(x => ({ ...r, rooms: [x], total: x.adults })));
 const roomNos = r => r.rooms.map(x => t('room.no', { n: x.room })).join(', ');
 const roomType = name => (ROOM_TYPES[S.lang] && ROOM_TYPES[S.lang][name]) || name;
 const ROOM_TYPES = {
@@ -1127,7 +1133,7 @@ function searchNumber(q) {
 }
 function found(list, method, q) {
   if (!list.length) return openError(method, q);
-  S.matches = list;
+  S.matches = splitRooms(list);
   S.selected = -1;
   go('list');   // 항상 복수의 예약 확인 화면을 거쳐 예약 세부 정보 확인으로 이동
 }
@@ -1180,8 +1186,8 @@ function renderList() {
       <div class="t lbl" style="left:475px;top:174px;font-size:23px">${esc(t('card.out'))}</div>
       <div class="t b" style="right:37px;top:174px;font-size:23px">${esc(fmtLong(r.out))}</div>
       <img src="${asset('bed')}" alt="">
-      ${[...r.rooms.map(x => [t('room.no', { n: x.room }), t('room.line', { type: roomType(x.type), n: x.adults })]),
-        [t('card.platform'), r.platform], [t('card.no'), r.no], [t('card.summary'), t('res.summary', { r: r.rooms.length, n: r.total })]]
+      ${[[t('card.room'), roomNos(r)], [t('modal.roomtype'), roomType(r.rooms[0].type)], [t('card.adults'), t('res.adults', { n: r.total })],
+        [t('card.platform'), r.platform], [t('card.no'), r.no]]
         .map(([k, v], j) => `<div class="t" style="left:480px;top:${236 + j * 44}px;font-size:23px">${esc(k)}</div>
         <div class="t" style="right:41px;top:${236 + j * 44}px;font-size:23px">${esc(v)}</div>`).join('')}
     </div>`).join('');
@@ -1235,7 +1241,7 @@ function openConfirm() {
   }
   openModal({
     title: t('modal.title'),
-    rows: [[t('card.name'), r.name], [t('card.room'), `${roomNos(r)} (${t('res.summary', { r: r.rooms.length, n: r.total })})`], [t('card.in'), fmtLong(r.in)], [t('card.out'), fmtLong(r.out)]],
+    rows: [[t('card.name'), r.name], [t('card.room'), `${roomNos(r)} · ${roomType(r.rooms[0].type)}`], [t('card.in'), fmtLong(r.in)], [t('card.out'), fmtLong(r.out)]],
     w1: t('modal.w1'), w2: t('modal.w2'), w3: t('modal.w3'),
     onOk: () => go('guests'),
   });
@@ -1324,8 +1330,8 @@ $('#ok-next').addEventListener('click', () => {
 function roomCard(el, r, photo) {
   const inT = S.flow === 'walkin' ? new Date() : r.in;
   el.innerHTML = `
-    <div class="t b" style="left:42px;top:42px;font-size:36px;color:#292a28">${esc(t('room.title', { r: r.rooms.length, n: r.total }))}</div>
-    <div class="t" style="left:42px;top:82px;font-size:24px;color:#8f918e">${esc(r.rooms.map(x => `${t('room.no', { n: x.room })} ${roomType(x.type)}`).join(' / '))}</div>
+    <div class="t b" style="left:42px;top:42px;font-size:36px;color:#292a28">${esc(roomType(r.rooms[0].type))}</div>
+    <div class="t" style="left:42px;top:82px;font-size:24px;color:#8f918e">${esc(`${roomNos(r)} · ${t('res.adults', { n: r.total })}`)}</div>
     <div class="hr"></div>
     <div class="t" style="left:42px;top:170px;font-size:25px;color:#747870">${esc(t('card.in'))} ${esc(fmtShort(inT))}</div>
     <div class="vr"></div>
@@ -1337,7 +1343,7 @@ function roomCard(el, r, photo) {
 function renderDone() {
   const r = S.res;
   const co = S.flow === 'checkout';
-  $('#done-room').textContent = r.rooms.map(x => x.room).join(' · ');
+  $('#done-room').textContent = r.rooms[0].room;
   $('#done-title').textContent = t(co ? 'done.coTitle' : 'done.title');
   $('#done-again').textContent = t(co ? 'btn.againCo' : 'btn.again');
   roomCard($('#done-card'), r, true);
@@ -1401,8 +1407,8 @@ applyLang();
 const params = new URLSearchParams(location.search);
 const startAt = params.get('screen');
 if (startAt && CHROME[startAt]) {
-  if (!S.res) S.res = RESERVATIONS[0];
-  if (startAt === 'list') { S.matches = RESERVATIONS.slice(); S.selected = -1; }
+  if (!S.res) S.res = splitRooms(RESERVATIONS)[0];
+  if (startAt === 'list') { S.matches = splitRooms(RESERVATIONS); S.selected = -1; }
   go(startAt, { push: false });
 } else go('lang', { push: false });
 
